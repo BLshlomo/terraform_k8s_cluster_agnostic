@@ -13,21 +13,11 @@ resource helm_release nginx-controller {
 data kubernetes_service nginx-lb {
   count = var.nginx_controller == true ? 1 : 0
   metadata {
-    #name      = "${helm_release.nginx-controller[count.index].name}-controller"
-    #namespace = helm_release.nginx-controller[count.index].namespace
     name      = "${join("", helm_release.nginx-controller[*].name)}-controller"
     namespace = join("", helm_release.nginx-controller[*].namespace)
   }
   depends_on = [
     helm_release.nginx-controller
-  ]
-}
-
-output nginx-lb-ip {
-  value = data.kubernetes_service.nginx-lb[*].load_balancer_ingress[*].ip
-  #value = "${join("", helm_release.nginx-controller[*].name)}-controller"
-  depends_on = [
-    helm_release.nginx_controller[0]
   ]
 }
 
@@ -84,15 +74,8 @@ resource helm_release helm-operator {
   }
 }
 
-output flux-deploy-key {
-  value = file("${path.root}/flux-deploy-key.pub")
-
-  depends_on = [
-    helm_release.helm-operator[0]
-  ]
-}
-
 resource helm_release logger {
+  count = var.logger == true ? 1 : 0
   name  = "logger"
   chart = "${path.module}/new/kube-logging"
 }

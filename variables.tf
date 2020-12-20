@@ -23,3 +23,8 @@ variable config_repo {
   default     = "git@github.com:BLshlomo/chatapp-k8s-fluxcd-config.git"
 }
 
+variable logger {
+  description = "Enable fluentbit, kibana and es logging stack"
+  default     = true
+}
+

@@ -12,3 +12,8 @@ variable config_repo {
   description = "flux operator config repo"
   type        = string
 }
+
+variable logger {
+  description = "Enable fluentbit, kibana and es logging stack"
+  type        = bool
+}

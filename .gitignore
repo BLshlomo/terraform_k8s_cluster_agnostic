@@ -1,0 +1,5 @@
+**/*.terraform/
+**/*.tgz
+**/cluster_management/charts/
+**/dashboard/token.txt
+**/flux-deploy-key.pub
