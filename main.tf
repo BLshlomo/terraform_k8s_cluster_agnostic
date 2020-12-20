@@ -75,6 +75,7 @@ module cluster_management {
   nginx_controller = var.nginx_controller
   flux             = var.flux
   config_repo      = var.config_repo
+  logger           = var.logger
 }
 
 resource null_resource set-dns {
@@ -117,12 +118,4 @@ resource helm_release mysql-staging {
     name  = "mysqlPassword"
     value = var.db_pass
   }
-}
-
-output nginx-lb-ip {
-  value = module.cluster_management.nginx-lb-ip
-}
-
-output flux-deploy-key {
-  value = module.cluster_management.flux-deploy-key
 }
