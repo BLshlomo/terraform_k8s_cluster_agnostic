@@ -38,7 +38,7 @@ provider kubernetes {
   load_config_file = true
   version          = "~> 1.13"
 
-  config_path = "/home/Admin/docker/24_final_exam/tfm/k8s_cluster/stage-1/kubeconfig"
+  config_path = var.kubeconfig
 
   #  host = "https://${data.google_container_cluster.my_cluster.endpoint}"
   #  #token = data.google_client_config.provider.access_token
@@ -56,7 +56,7 @@ provider kubernetes {
 provider "helm" {
   version = "~> 1.3"
   kubernetes {
-    config_path = "/home/Admin/docker/24_final_exam/tfm/k8s_cluster/stage-1/kubeconfig"
+    config_path = var.kubeconfig
 
     #    host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
     #    token = data.google_client_config.provider.access_token
@@ -84,7 +84,7 @@ resource null_resource set-dns {
     module.cluster_management.nginx-lb-ip
   ]
   provisioner local-exec {
-    command = "curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${join("", module.cluster_management.nginx-lb-ip[0])}' -H \"Authorization: Basic U29sb21vbkI6Y2tEQUxWNlJwcWlHOUZnCg==\""
+    command = "curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${join("", module.cluster_management.nginx-lb-ip[0])}' -H \"Authorization: Basic ${var.dynu_ip_auth}\""
   }
 }
 

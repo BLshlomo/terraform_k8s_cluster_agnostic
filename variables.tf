@@ -28,3 +28,10 @@ variable logger {
   default     = true
 }
 
+variable kubeconfig {
+  description = "kubeconfig location path"
+}
+
+variable dynu_ip_auth {
+  description = "dynu api change ip"
+}
