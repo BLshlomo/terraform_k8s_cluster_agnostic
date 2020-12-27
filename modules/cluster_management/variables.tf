@@ -3,6 +3,11 @@ variable nginx_controller {
   type        = bool
 }
 
+variable cert_manager {
+  description = "Enable cert-manager controller"
+  type        = bool
+}
+
 variable flux {
   description = "Enable flux operator"
   type        = bool

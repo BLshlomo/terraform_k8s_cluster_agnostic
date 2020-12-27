@@ -8,14 +8,14 @@ variable nginx_controller {
   default     = true
 }
 
-variable db_pass {
-  description = "chatapp db password access"
-  default     = "\"12345\""
+variable cert_manager {
+  description = "Enable cert-manager controller"
+  default     = true
 }
 
 variable flux {
   description = "Enable flux operator"
-  default     = true
+  default     = false
 }
 
 variable config_repo {
@@ -25,7 +25,7 @@ variable config_repo {
 
 variable logger {
   description = "Enable fluentbit, kibana and es logging stack"
-  default     = true
+  default     = false
 }
 
 variable kubeconfig {
@@ -34,4 +34,8 @@ variable kubeconfig {
 
 variable dynu_ip_auth {
   description = "dynu api change ip"
+}
+
+variable db_pass {
+  description = "chatapp db password access"
 }

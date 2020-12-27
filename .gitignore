@@ -1,6 +1,7 @@
 **/*.terraform/
 **/*.tgz
-**/cluster_management/charts/
+**/old-charts/
 **/dashboard/token.txt
 **/flux-deploy-key.pub
 **/terraform.tfvars
+**/cert/

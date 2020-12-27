@@ -71,20 +71,21 @@ provider null {
 }
 
 module cluster_management {
-  source           = "./cluster_management"
+  source           = "./modules/cluster_management"
   nginx_controller = var.nginx_controller
   flux             = var.flux
   config_repo      = var.config_repo
   logger           = var.logger
+  cert_manager     = var.cert_manager
 }
 
 resource null_resource set-dns {
-  count = length(module.cluster_management.nginx-lb-ip) > 0 ? 1 : 0
-  depends_on = [
-    module.cluster_management.nginx-lb-ip
-  ]
+  triggers = {
+    lb-ip = join("", module.cluster_management.nginx-lb-ip[0])
+  }
+
   provisioner local-exec {
-    command = "curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${join("", module.cluster_management.nginx-lb-ip[0])}' -H \"Authorization: Basic ${var.dynu_ip_auth}\""
+    command = "curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${self.triggers.lb-ip}' -H \"Authorization: Basic ${var.dynu_ip_auth}\""
   }
 }
 
