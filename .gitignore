@@ -5,3 +5,4 @@
 **/flux-deploy-key.pub
 **/terraform.tfvars
 **/cert/
+**/grafana-admin-key

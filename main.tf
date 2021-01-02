@@ -72,51 +72,106 @@ provider null {
 
 module cluster_management {
   source           = "./modules/cluster_management"
+  logger           = var.logger
+  prometheus       = var.prometheus
   nginx_controller = var.nginx_controller
+  cert_manager     = var.cert_manager
   flux             = var.flux
   config_repo      = var.config_repo
-  logger           = var.logger
-  cert_manager     = var.cert_manager
 }
 
 resource null_resource set-dns {
+  count = var.nginx_controller == true ? 1 : 0
+  depends_on = [
+    module.cluster_management.nginx-lb-ip
+  ]
+
   triggers = {
     lb-ip = join("", module.cluster_management.nginx-lb-ip[0])
   }
 
   provisioner local-exec {
-    command = "curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${self.triggers.lb-ip}' -H \"Authorization: Basic ${var.dynu_ip_auth}\""
+    command = "echo ${self.triggers.lb-ip} && echo \"ip = $ip\" && [ `echo ${self.triggers.lb-ip} | wc -m` -gt 2 -a '${self.triggers.lb-ip}' != \"$ip\" ] && ip='${self.triggers.lb-ip}' && curl -X GET 'https://api.dynu.com/nic/update?hostname=${var.dns_addr}&myip=${self.triggers.lb-ip}' -H \"Authorization: Basic ${var.dynu_ip_auth}\" || exit 0"
   }
 }
 
 resource helm_release mysql {
-  name  = "mysql"
-  chart = "${path.root}/deploy/mysql"
-  wait  = true
+  count            = 0
+  name             = "mysql"
+  chart            = "${path.root}/deploy/mysql"
+  namespace        = "production"
+  create_namespace = true
+  wait             = true
 
   values = [
-    file("${path.root}/deploy/mysql/values.yaml")
+    file("${path.root}/deploy/mysql/values-production.yaml")
   ]
 
   set {
-    name  = "mysqlPassword"
-    value = var.db_pass
+    name  = "metrics.serviceMonitor.namespace"
+    value = "monitoring"
+  }
+
+  set {
+    name  = "metrics.serviceMonitor.enabled"
+    value = true
+  }
+
+  set {
+    name  = "auth.forcePassword"
+    value = false
+  }
+
+  set {
+    name  = "auth.usePasswordFiles"
+    value = false
+  }
+
+  set {
+    name  = "auth.customPasswordFiles"
+    value = ""
+  }
+
+  set {
+    name  = "primary.persistence.enabled"
+    value = false
+  }
+
+  set {
+    name  = "secondary.persistence.enabled"
+    value = false
+  }
+
+  set {
+    name  = "auth.database"
+    value = "chat"
+  }
+
+  set {
+    name  = "auth.username"
+    value = "chat"
+  }
+
+  set {
+    name  = "auth.password"
+    value = var.prod_db_pass
   }
 }
 
 resource helm_release mysql-staging {
+  count            = 0
   name             = "mysql-staging"
-  chart            = "${path.root}/deploy/mysql"
+  chart            = "${path.root}/deploy/mysql-dev"
   namespace        = "staging"
   create_namespace = true
   wait             = true
 
   values = [
-    file("${path.root}/deploy/mysql/values.yaml")
+    file("${path.root}/deploy/mysql-dev/values.yaml")
   ]
 
   set {
     name  = "mysqlPassword"
-    value = var.db_pass
+    value = var.stg_db_pass
   }
 }

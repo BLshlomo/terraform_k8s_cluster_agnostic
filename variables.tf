@@ -3,6 +3,16 @@ variable dns_addr {
   default     = "Devops2020.ddnsgeek.com"
 }
 
+variable logger {
+  description = "Enable fluentbit, kibana and es logging stack"
+  default     = true
+}
+
+variable prometheus {
+  description = "Enable prometheus monitoring"
+  default     = true
+}
+
 variable nginx_controller {
   description = "Enable nginx controller"
   default     = true
@@ -15,17 +25,12 @@ variable cert_manager {
 
 variable flux {
   description = "Enable flux operator"
-  default     = false
+  default     = true
 }
 
 variable config_repo {
   description = "flux operator config repo"
   default     = "git@github.com:BLshlomo/chatapp-k8s-fluxcd-config.git"
-}
-
-variable logger {
-  description = "Enable fluentbit, kibana and es logging stack"
-  default     = false
 }
 
 variable kubeconfig {
@@ -36,6 +41,10 @@ variable dynu_ip_auth {
   description = "dynu api change ip"
 }
 
-variable db_pass {
-  description = "chatapp db password access"
+variable stg_db_pass {
+  description = "staging env chatapp db password access"
+}
+
+variable prod_db_pass {
+  description = "production mysql cluster chatapp db password access"
 }

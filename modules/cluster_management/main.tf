@@ -1,3 +1,42 @@
+resource helm_release logger {
+  count = var.logger == true ? 1 : 0
+  name  = "logger"
+  chart = "${path.module}/charts/kube-logging"
+}
+
+resource helm_release prometheus {
+  count            = var.prometheus == true ? 1 : 0
+  name             = "monitor"
+  namespace        = "monitoring"
+  create_namespace = true
+  chart            = "${path.module}/charts/kube-prometheus-stack"
+
+  provisioner local-exec {
+    command = "kubectl get secret --namespace monitoring monitor-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo > ${path.root}/grafana-admin-key"
+  }
+
+  values = [
+    file("${path.module}/charts/kube-prometheus-stack/values.yaml")
+  ]
+
+  set {
+    name  = "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues"
+    value = false
+  }
+
+  set {
+    name  = "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues"
+    value = false
+  }
+}
+
+#resource null_resource grafana-password {
+#  count = var.prometheus == true ? 1 : 0
+#  depends_on = [
+#    helm_release.prometheus
+#  ]
+#}
+#
 resource helm_release nginx-controller {
   count            = var.nginx_controller == true ? 1 : 0
   name             = "ingress-nginx"
@@ -99,10 +138,4 @@ resource helm_release helm-operator {
   provisioner local-exec {
     command = "fluxctl identity --k8s-fwd-ns flux > ${path.root}/flux-deploy-key.pub"
   }
-}
-
-resource helm_release logger {
-  count = var.logger == true ? 1 : 0
-  name  = "logger"
-  chart = "${path.module}/charts/kube-logging"
 }

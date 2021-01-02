@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: exporters-monitor
+  namespace: monitoring
+  labels:
+    k8s-apps: http
+spec:
+  namespaceSelector:
+    any: true
+  selector:
+    matchExpressions:
+    - {key: app.kubernetes.io/component, operator: In, values: ["metrics"]}
+  endpoints:
+  - port: metrics
+    interval: 15s

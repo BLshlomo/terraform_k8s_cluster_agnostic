@@ -13,3 +13,10 @@ output flux-deploy-key {
   ]
 }
 
+output grafana-password {
+  value = file("${path.root}/grafana-admin-key")
+
+  depends_on = [
+    helm_release.prometheus[0]
+  ]
+}
